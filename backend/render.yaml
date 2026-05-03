@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: cfrp-shm-api
+    env: node
+    plan: free
+    region: ohio
+    buildCommand: "bash ./build.sh"
+    startCommand: "npm start"
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5001
+      - key: MONGODB_URI
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false

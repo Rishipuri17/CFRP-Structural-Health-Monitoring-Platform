@@ -1,0 +1,133 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Base resets ─────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background-color: #0F1117;
+  color: #E8EDF5;
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+/* ── Scrollbar ───────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #1C2333; }
+::-webkit-scrollbar-thumb { background: #2E3A52; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #00D4FF44; }
+
+/* ── Recharts global overrides ───────────────────────────────────────────── */
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+  stroke: rgba(255,255,255,0.06) !important;
+}
+.recharts-text { fill: #8A9BB5 !important; font-size: 11px; font-family: 'JetBrains Mono', monospace; }
+.recharts-tooltip-wrapper { border: none !important; }
+
+/* ── Engineering tooltip ─────────────────────────────────────────────────── */
+.eng-tooltip {
+  background: #1C2333 !important;
+  border: 1px solid #2E3A52 !important;
+  border-radius: 4px !important;
+  padding: 8px 12px !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 12px !important;
+  color: #E8EDF5 !important;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.4) !important;
+}
+
+/* ── Skeleton shimmer ────────────────────────────────────────────────────── */
+.skeleton {
+  background: linear-gradient(90deg, #1C2333 25%, #242B3D 50%, #1C2333 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Glass card ──────────────────────────────────────────────────────────── */
+.glass-card {
+  background: rgba(28, 35, 51, 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(46, 58, 82, 0.6);
+  border-radius: 6px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+}
+
+/* ── Cyan glow button ────────────────────────────────────────────────────── */
+.btn-primary {
+  background: linear-gradient(135deg, #00D4FF22, #00D4FF11);
+  border: 1px solid #00D4FF55;
+  color: #00D4FF;
+  padding: 10px 24px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.05em;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+}
+.btn-primary:hover {
+  background: linear-gradient(135deg, #00D4FF33, #00D4FF22);
+  border-color: #00D4FF;
+  box-shadow: 0 0 20px rgba(0,212,255,0.3);
+  transform: translateY(-1px);
+}
+.btn-primary:active { transform: translateY(0); }
+
+/* ── Metric card ─────────────────────────────────────────────────────────── */
+.metric-card {
+  background: #1C2333;
+  border: 1px solid #2E3A52;
+  border-radius: 6px;
+  padding: 16px 20px;
+  transition: all 0.2s ease;
+}
+.metric-card:hover { border-color: #00D4FF44; }
+
+/* ── Range input ─────────────────────────────────────────────────────────── */
+input[type='range'] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: #2E3A52;
+  outline: none;
+}
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #00D4FF;
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(0,212,255,0.4);
+}
+
+/* ── Page transitions ────────────────────────────────────────────────────── */
+.page-enter { opacity: 0; transform: translateY(16px); }
+.page-enter-active { opacity: 1; transform: translateY(0); transition: all 0.4s ease; }
+
+/* ── SSE log output ──────────────────────────────────────────────────────── */
+.sse-log {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: #8A9BB5;
+  line-height: 1.8;
+}
+.sse-log .done  { color: #10B981; }
+.sse-log .error { color: #EF4444; }
+.sse-log .running { color: #F59E0B; }

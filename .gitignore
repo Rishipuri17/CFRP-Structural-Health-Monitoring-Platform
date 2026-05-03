@@ -1,0 +1,38 @@
+# Node
+node_modules/
+dist/
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg
+*.egg-info/
+.venv/
+venv/
+env/
+
+# ML artifacts (regenerate with training)
+backend/models/*.pkl
+backend/models/*.json
+
+# Data files
+backend/data/raw/*.mat
+backend/data/processed/*.csv
+backend/data/processed/*.pkl
+
+# OS
+.DS_Store
+Thumbs.db
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Docker
+.dockerignore

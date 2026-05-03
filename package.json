@@ -1,0 +1,16 @@
+{
+  "name": "cfrp-shm-platform",
+  "version": "1.0.0",
+  "description": "CFRP Structural Health Monitoring — MERN + Python ML Platform",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently --names \"API,UI\" --prefix-colors \"cyan,magenta\" \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
+    "install:all": "npm install --prefix backend && npm install --prefix frontend",
+    "build:frontend": "npm run build --prefix frontend",
+    "train": "cd backend && python src/simulate.py && python src/train_classifier.py && python src/train_regressor.py",
+    "setup": "npm run install:all && npm run train"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

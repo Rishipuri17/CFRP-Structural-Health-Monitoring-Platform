@@ -1,0 +1,2 @@
+# Trained model artifacts are saved here by train_classifier.py and train_regressor.py
+# best_classifier.pkl, best_regressor.pkl, scaler.pkl, *.json metrics

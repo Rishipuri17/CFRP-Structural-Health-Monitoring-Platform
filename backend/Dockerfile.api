@@ -1,0 +1,17 @@
+FROM python:3.11-slim AS python-layer
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY src/ src/
+COPY config.py .
+
+FROM node:20-slim
+WORKDIR /app
+COPY --from=python-layer /usr/local/lib/python3.11 /usr/local/lib/python3.11
+COPY --from=python-layer /usr/local/bin/python3.11 /usr/local/bin/python3.11
+RUN ln -sf /usr/local/bin/python3.11 /usr/bin/python3 && ln -sf /usr/bin/python3 /usr/bin/python
+COPY package.json .
+RUN npm install --production
+COPY . .
+EXPOSE 5001
+CMD ["node", "server.js"]

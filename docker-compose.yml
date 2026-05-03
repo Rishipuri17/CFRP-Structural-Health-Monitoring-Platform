@@ -1,0 +1,68 @@
+version: "3.9"
+
+services:
+  # ── MongoDB ────────────────────────────────────────────────────────────────
+  mongo:
+    image: mongo:7
+    container_name: cfrp_mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Python ML Pipeline (one-shot training) ─────────────────────────────────
+  ml-pipeline:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.ml
+    container_name: cfrp_ml
+    volumes:
+      - ./backend/data:/app/data
+      - ./backend/models:/app/models
+    command: >
+      sh -c "
+        python src/simulate.py &&
+        python src/train_classifier.py &&
+        python src/train_regressor.py &&
+        echo 'ML pipeline complete.'
+      "
+
+  # ── Express API ────────────────────────────────────────────────────────────
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.api
+    container_name: cfrp_api
+    ports:
+      - "5001:5001"
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017/cfrp_shm
+      - PYTHON_PATH=python3
+      - NODE_ENV=production
+    volumes:
+      - ./backend/data:/app/data
+      - ./backend/models:/app/models
+    depends_on:
+      mongo:
+        condition: service_healthy
+      ml-pipeline:
+        condition: service_completed_successfully
+
+  # ── React Frontend ─────────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.frontend
+    container_name: cfrp_frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - api
+
+volumes:
+  mongo_data:
