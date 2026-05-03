@@ -20,8 +20,6 @@ import json
 import logging
 import warnings
 import numpy as np
-import joblib
-import pandas as pd
 
 warnings.filterwarnings("ignore")
 logging.basicConfig(level=logging.WARNING)
@@ -36,16 +34,17 @@ from config import (
     DAMAGE_STATES, DAMAGE_COLORS, RUL_ALERT_THRESHOLD,
 )
 from src.data_loader import DataLoader
-from src.feature_extractor import FeatureExtractor
-from src.explainer import SHAPExplainer
-from src.evaluate import build_rul_history
 
 # ── helpers ───────────────────────────────────────────────────────────────────
 
 _loader    = DataLoader()
-_extractor = FeatureExtractor()
+
+def _get_extractor():
+    from src.feature_extractor import FeatureExtractor
+    return FeatureExtractor()
 
 def _load_models():
+    import joblib
     if not (os.path.exists(CLASSIFIER_PATH) and os.path.exists(REGRESSOR_PATH)):
         return None, None, None
     clf    = joblib.load(CLASSIFIER_PATH)
@@ -64,7 +63,10 @@ def _get_features(panel_id: str, cycle: int, scaler):
     closest_idx = int(np.argmin([abs(c - cycle) for c in cycles]))
     rec = records[closest_idx]
 
-    feats = _extractor.extract_one(rec["signals"])
+    extractor = _get_extractor()
+    feats = extractor.extract_one(rec["signals"])
+    
+    import pandas as pd
     X = pd.DataFrame([feats])
     for col in ["cycle", "panel_id", "max_cycles", "life_fraction",
                 "damage_label", "damage_state", "rul", "rul_normalized"]:
@@ -150,7 +152,9 @@ def cmd_rul(panel_id: str, cycle: int):
     true_rul      = float(max(0, rec["max_cycles"] - rec["cycle"]))
     rul_norm      = predicted_rul / rec["max_cycles"]
 
-    history = build_rul_history(reg, records, scaler, _extractor, closest_idx)
+    from src.evaluate import build_rul_history
+    extractor = _get_extractor()
+    history = build_rul_history(reg, records, scaler, extractor, closest_idx)
 
     hours_at_1hz = predicted_rul / 3600.0
 
@@ -178,10 +182,14 @@ def cmd_shap(panel_id: str, cycle: int):
         print(json.dumps({"error": f"Panel '{panel_id}' not found.", "status": 404}))
         return
 
+    import pandas as pd
+    from src.explainer import SHAPExplainer
+    
     # Build feature matrix for all cycles (background)
     rows = []
+    extractor = _get_extractor()
     for rec in records:
-        feats = _extractor.extract_one(rec["signals"])
+        feats = extractor.extract_one(rec["signals"])
         X = pd.DataFrame([feats])
         for col in ["cycle", "panel_id", "max_cycles", "life_fraction",
                     "damage_label", "damage_state", "rul", "rul_normalized"]:
@@ -214,8 +222,11 @@ def cmd_importance():
         print(json.dumps({"error": "Models not trained.", "status": 503}))
         return
 
+    import pandas as pd
+    from src.explainer import SHAPExplainer
+    
     loader    = DataLoader()
-    extractor = FeatureExtractor()
+    extractor = _get_extractor()
     all_data  = loader.load_mat_files()
 
     rows = []
