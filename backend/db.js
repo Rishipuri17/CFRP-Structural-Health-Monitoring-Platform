@@ -8,6 +8,8 @@ const mongoose = require("mongoose");
 const connect = async () => {
   const uri = process.env.MONGODB_URI || "mongodb://localhost:27017/cfrp_shm";
   try {
+    // Disable bufferCommands so queries immediately throw if db is unreachable (avoids infinite hanging)
+    mongoose.set('bufferCommands', false);
     await mongoose.connect(uri, { serverSelectionTimeoutMS: 3000 });
     console.log(`[MongoDB] Connected → ${uri}`);
   } catch (err) {
