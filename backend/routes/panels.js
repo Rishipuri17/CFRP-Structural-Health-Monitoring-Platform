@@ -15,7 +15,13 @@ router.get("/", async (_req, res) => {
 
   if (panels.length === 0) {
     // Fall back to Python (reads disk)
-    const ids = await runPythonScript("infer.py", ["panels"]);
+    let ids = [];
+    try {
+      ids = await runPythonScript("infer.py", ["panels"]);
+    } catch (err) {
+      console.error("[Panels] Python script failed:", err.message);
+    }
+    
     for (const id of ids) {
       const meta = await runPythonScript("infer.py", ["metadata", id]);
       try {
