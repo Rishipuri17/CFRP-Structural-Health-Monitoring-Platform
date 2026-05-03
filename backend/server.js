@@ -24,7 +24,6 @@ const isProd = process.env.NODE_ENV === "production";
 
 // ── CORS ────────────────────────────────────────────────────────────────────
 // CORS_ORIGIN is set to the Vercel frontend URL in production.
-// Accepts a comma-separated list, e.g. "https://cfrp-shm.vercel.app,https://www.cfrp-shm.com"
 const allowedOrigins = process.env.CORS_ORIGIN
   ? process.env.CORS_ORIGIN.split(",").map((o) => o.trim())
   : ["http://localhost:5173", "http://localhost:4173"];
@@ -34,7 +33,11 @@ app.use(
     origin: (origin, callback) => {
       // Allow requests with no origin (mobile apps, curl, Postman)
       if (!origin) return callback(null, true);
+      // Allow if exactly matches allowedOrigins
       if (allowedOrigins.includes(origin)) return callback(null, true);
+      // Allow ANY vercel domain (solves preview domain matching issues)
+      if (origin.endsWith(".vercel.app")) return callback(null, true);
+      
       callback(new Error(`CORS: origin '${origin}' not allowed`));
     },
     credentials: true,
